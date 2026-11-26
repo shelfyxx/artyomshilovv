@@ -1,0 +1,138 @@
+:root {
+  /* Палитра «выцветшая бумага»: тёплый фон, тёмно-коричневый (не чёрный) текст */
+  --bg: #e8e1d0; --ink: #2b2420; --muted: #6b5f51; --line: #cdc3ab; --line-strong: #b9ad92; /* --line-strong: линии между разделами, чуть темнее линий внутри */ --chip: #ddd5bb;
+  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .42 0 0 0 0 .32 0 0 0 0 .2 0 0 0 .1 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  --display: "Newsreader Variable", "Literata Variable", Georgia, serif; /* шрифт имени, как в заголовке на фото-примере */
+  --panel: #d9d3bf; /* заливка рамки с фразой, как бежево-серый фон окошка на иллюстрации */
+  --serif: "Lora Variable", Georgia, serif;
+  --sans: "Inter Variable", system-ui, sans-serif;
+  --pad: clamp(1.25rem, 5vw, 4rem);
+  --edge: max(var(--pad), calc((100vw - 80rem) / 2 + var(--pad)));
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: 4rem; }
+/* Бумага: светлое пятно сверху и едва заметное зерно (SVG-шум), цвет фона остаётся --bg */
+body { background-color: var(--bg);
+  background-image:
+    radial-gradient(90rem 40rem at 70% -5%, #f3eddf99, #f3eddf00 70%),
+    var(--grain);
+  color: var(--ink); font: 400 1.0625rem/1.7 var(--serif); -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+main { max-width: 80rem; margin: 0 auto; }
+.nav ul, .sec h2, .tags, .hint, .foot, .btn, .link { font-family: var(--sans); }
+
+/* Навигация */
+.nav { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center;
+  padding: 1rem var(--edge); background: color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter: blur(10px); }
+.logo { font-weight: 500; font-size: 1.15rem; letter-spacing: -.01em; text-decoration: none; }
+.nav ul { display: flex; gap: 2rem; list-style: none; font-size: .9rem; }
+.nav ul a { color: var(--muted); text-decoration: none; transition: color .2s; }
+.nav ul a:hover { color: var(--ink); }
+.burger { display: none; position: relative; width: 2rem; height: 2rem; background: none; border: 0; cursor: pointer; }
+.burger span { position: absolute; left: .3rem; right: .3rem; height: 1.5px; background: var(--ink); transition: .25s; }
+.burger span:first-child { top: .8rem; } .burger span:last-child { top: 1.2rem; }
+.burger[aria-expanded="true"] span:first-child { top: 1rem; transform: rotate(45deg); }
+.burger[aria-expanded="true"] span:last-child { top: 1rem; transform: rotate(-45deg); }
+
+/* Главный экран: текст слева, портрет справа */
+.hero { display: grid; grid-template-columns: 1.15fr 1fr; align-items: start; gap: 2rem 3rem;
+  padding: clamp(1rem, 3vw, 2rem) var(--pad) clamp(3rem, 8vw, 6rem); }
+.hero-text { padding-top: clamp(1rem, 5vw, 4rem); /* чем меньше, тем выше имя */
+  padding-left: clamp(.5rem, 3.5vw, 3.5rem); } /* сдвиг всего текста главного экрана вправо */
+h1 { font: 460 clamp(3.4rem, 9.5vw, 8.5rem)/1.12 var(--display); font-variation-settings: "opsz" 28; letter-spacing: -.025em; }
+/* opsz 28: «мягкая» форма букв (при большом размере шрифт сам выбрал бы острую, контрастную) */
+.line { display: block; } /* без overflow: hidden, поэтому хвост буквы y нигде не обрезается */
+.line:nth-child(2) { padding-left: clamp(1.5rem, 6vw, 5rem); }
+.line > span { display: block; animation: rise 1.1s cubic-bezier(.2, .7, .2, 1) both; }
+.line:nth-child(2) > span { animation-delay: .12s; }
+.roles { margin-top: clamp(1.5rem, 4vw, 2.5rem); max-width: 28ch; font-size: clamp(1.15rem, 2vw, 1.5rem);
+  line-height: 1.4; color: var(--muted); animation: fade 1s .6s both; }
+/* Фраза про бизнес: рамка «от руки» в стиле иллюстрации-примера (мягкая чёрная обводка, бежево-серая заливка).
+   Рамку и заливку рисует ::before, а фильтр #sketch из App.tsx делает линию чуть неровной и мягкой.
+   Сам текст не искажается. */
+.pitch { position: relative; isolation: isolate; width: fit-content; max-width: min(100%, 24rem);
+  margin-bottom: clamp(1.5rem, 4vw, 3rem); padding: 1.4rem 1.9rem; color: #2f2923;
+  font: 450 clamp(1.15rem, 2vw, 1.6rem)/1.35 var(--display); font-variation-settings: "opsz" 14;
+  animation: fade 1s .2s both; }
+.pitch::before { content: ""; position: absolute; inset: 0; z-index: -1; border: .22rem solid #1c1917; border-radius: .6rem;
+  background: var(--panel); filter: url(#sketch); }
+.cta { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.5rem; margin-top: 2rem; animation: fade 1s .8s both; }
+.btn { padding: 1rem 1.9rem; border-radius: .6rem; background: var(--ink); color: var(--bg);
+  font-size: 1.1rem; font-weight: 500; line-height: 1.3; text-decoration: none; transition: opacity .2s; }
+.btn:hover { opacity: .85; }
+.link { font-size: 1.1rem; font-weight: 500; text-underline-offset: .25em; }
+
+/* Портрет. Это не картинка, а маска: чернила цвета --ink видны только там, где photo.webp непрозрачный
+   (тёмное = видно, светлое = прозрачно). Поэтому у фото нет фона и нет краёв при любом цвете страницы.
+   Нижний край растворён прямо в файле. --p (0..1, из положения прокрутки) сдвигает, уменьшает и гасит фото. */
+.figure { position: relative; width: 100%; max-width: 34rem; justify-self: end; aspect-ratio: 1086 / 1448;
+  transform: translateY(calc(var(--p, 0) * 14vh)) scale(calc(1 - var(--p, 0) * .08));
+  transform-origin: 50% 100%; opacity: calc(1 - var(--p, 0) * .7);
+  animation: unveil 1.4s .15s cubic-bezier(.2, .7, .2, 1) both; }
+.photo, .paper, .ink { position: absolute; inset: 0; -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
+.photo, .ink { background: var(--ink); }
+.paper { background: var(--grain) var(--bg); } /* контур логотипа залит цветом бумаги */
+
+/* Логотипы: отдельные слои (контур + штриховка), плавно левитируют вверх и вниз */
+.float { position: absolute; animation: levitate 4.2s ease-in-out infinite alternate; }
+
+@keyframes rise { from { opacity: 0; transform: translateY(.25em); } }
+@keyframes fade { from { opacity: 0; } }
+@keyframes unveil { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes levitate { from { transform: translateY(-5%); } to { transform: translateY(5%); } }
+
+/* Разделы: заголовок в липкой левой колонке, содержимое справа */
+.sec { display: grid; grid-template-columns: minmax(7rem, 1fr) 4fr; gap: 1.5rem 3rem;
+  padding: clamp(3rem, 8vw, 6rem) var(--pad); border-top: 1px solid var(--line-strong); }
+.sec h2 { position: sticky; top: 5rem; align-self: start; font-size: .95rem; font-weight: 500; color: var(--muted); }
+.big { max-width: 36ch; font-size: clamp(1.5rem, 3.4vw, 2.6rem); line-height: 1.3; letter-spacing: -.02em; }
+
+/* Подраздел «Мой стек» внутри «Обо мне» и списки услуг */
+.rows, .links { list-style: none; }
+.stack-block, .social-block { margin-top: clamp(2rem, 5vw, 3.5rem); padding-top: 1.2rem; border-top: 1px solid var(--line); }
+.stack-block h3, .social-block h3, .rows h3 { font: 500 clamp(1.4rem, 3vw, 2rem)/1.15 var(--serif); letter-spacing: -.02em; }
+.stack-block h3, .social-block h3 { margin-bottom: 1rem; }
+.social-block .links { margin-top: 0; }
+.social-block .links a { font-size: clamp(1.4rem, 3vw, 2rem); } /* ссылки блога мельче основных контактов */
+
+/* Услуги и проекты */
+.rows li { padding: 1.6rem 0; border-bottom: 1px solid var(--line); }
+.rows li:first-child { padding-top: 0; }
+#services .rows li:last-child { border-bottom-color: transparent; } /* у последней услуги линии нет (прозрачная, чтобы высота не изменилась) */
+.rows p { max-width: 46ch; margin-top: .6rem; color: var(--muted); }
+.tags { display: inline-block; margin-top: 1rem; padding: .15rem .6rem; border-radius: .3rem;
+  background: var(--chip); font-size: .78rem; color: var(--muted); }
+
+/* Стек */
+.stack { display: flex; flex-wrap: wrap; gap: .6rem; list-style: none; }
+.stack li { padding: .45rem 1rem; border-radius: 99px; background: var(--chip); font: 500 .95rem var(--sans); }
+
+/* Контакты */
+.links { margin-top: 2rem; }
+.links a { font-size: clamp(2rem, 5.5vw, 3.6rem); font-weight: 500; line-height: 1.2; letter-spacing: -.025em;
+  text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .2em; transition: color .2s; }
+.links a:hover { color: var(--muted); }
+.hint { margin-top: 2rem; color: var(--muted); font-size: .9rem; }
+.foot { padding: 2rem var(--edge); border-top: 1px solid var(--line-strong); color: var(--muted); font-size: .85rem; }
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; }
+  h1 { font-size: clamp(3.4rem, 17vw, 8rem); }
+  .figure { max-width: 26rem; justify-self: center; }
+}
+@media (max-width: 760px) {
+  .sec { grid-template-columns: 1fr; }
+  .sec h2 { position: static; }
+  .burger { display: block; }
+  .nav ul { position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0; background: var(--bg);
+    padding: .5rem var(--pad) 1rem; border-bottom: 1px solid var(--line);
+    opacity: 0; transform: translateY(-.5rem); pointer-events: none; transition: .25s; }
+  .nav ul.open { opacity: 1; transform: none; pointer-events: auto; }
+  .nav ul a { display: block; padding: .8rem 0; font-size: 1.1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  .figure { transform: none; opacity: 1; }
+}
